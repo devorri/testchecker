@@ -59,11 +59,23 @@ const Layout: React.FC = () => {
     );
   }
 
-  // Public layout — top navbar
+  // Landing page — always render without navbar
+  if (location.pathname === '/') {
+    return (
+      <div className="min-h-screen flex flex-col bg-[#060a12] text-slate-100 relative">
+        <div className="bg-glow-orb top-[-100px] left-[15%] opacity-40" />
+        <div className="bg-glow-orb top-[40%] right-[-100px] opacity-25" />
+        <main className="flex-1 relative z-10">
+          <Outlet />
+        </main>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen flex flex-col bg-[#060a12] text-slate-100 relative">
-      <div className="bg-glow-orb top-[-100px] left-[15%] opacity-40"></div>
-      <div className="bg-glow-orb top-[40%] right-[-100px] opacity-25"></div>
+      <div className="bg-glow-orb top-[-100px] left-[15%] opacity-40" />
+      <div className="bg-glow-orb top-[40%] right-[-100px] opacity-25" />
 
       <Navbar />
 
