@@ -8,6 +8,7 @@ import {
   Printer,
   Camera,
   BarChart3,
+  Users,
   LogOut,
   User,
 } from 'lucide-react';
@@ -18,6 +19,7 @@ interface SidebarProps {
 
 const navItems = [
   { to: '/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
+  { to: '/students', icon: Users, label: 'Student Rosters' },
   { to: '/exams', icon: FileText, label: 'Answer Keys' },
   { to: '/scantron-generator', icon: Printer, label: 'Scantron PDF' },
   { to: '/scanner', icon: Camera, label: 'OMR Scanner', pulse: true },

@@ -12,6 +12,7 @@ export interface Student {
   name: string;
   section: string;
   course: string;
+  year_level?: string;
 }
 
 export interface Exam {
@@ -54,13 +55,19 @@ export const INITIAL_INSTRUCTOR: Instructor = {
 };
 
 export const INITIAL_STUDENTS: Student[] = [
-  { student_id: 1, student_number: '2026-0012', name: 'Kyle G. Sanquillos', section: 'BSIT-3A', course: 'BS Information Technology' },
-  { student_id: 2, student_number: '2026-0015', name: 'Samantha Reyes', section: 'BSIT-3A', course: 'BS Information Technology' },
-  { student_id: 3, student_number: '2026-0021', name: 'Juan Dela Cruz', section: 'BSIT-3A', course: 'BS Information Technology' },
-  { student_id: 4, student_number: '2026-0034', name: 'Maria Santos', section: 'BSIT-3B', course: 'BS Computer Science' },
-  { student_id: 5, student_number: '2026-0045', name: 'Angelo Tan', section: 'BSIT-3B', course: 'BS Computer Science' },
-  { student_id: 6, student_number: '2026-0052', name: 'Christian Alcantara', section: 'BSIT-3A', course: 'BS Information Technology' },
-  { student_id: 7, student_number: '2026-0068', name: 'Erika Villanueva', section: 'BSIT-3A', course: 'BS Information Technology' },
+  { student_id: 1, student_number: '2026-0012', name: 'Kyle G. Sanquillos', section: 'BSIT-3A', course: 'BS Information Technology', year_level: '3rd Year' },
+  { student_id: 2, student_number: '2026-0015', name: 'Samantha Reyes', section: 'BSIT-3A', course: 'BS Information Technology', year_level: '3rd Year' },
+  { student_id: 3, student_number: '2026-0021', name: 'Juan Dela Cruz', section: 'BSIT-3A', course: 'BS Information Technology', year_level: '3rd Year' },
+  { student_id: 4, student_number: '2026-0034', name: 'Maria Santos', section: 'BSIT-3B', course: 'BS Computer Science', year_level: '3rd Year' },
+  { student_id: 5, student_number: '2026-0045', name: 'Angelo Tan', section: 'BSIT-3B', course: 'BS Computer Science', year_level: '3rd Year' },
+  { student_id: 6, student_number: '2026-0052', name: 'Christian Alcantara', section: 'BSIT-3A', course: 'BS Information Technology', year_level: '3rd Year' },
+  { student_id: 7, student_number: '2026-0068', name: 'Erika Villanueva', section: 'BSIT-3A', course: 'BS Information Technology', year_level: '3rd Year' },
+  { student_id: 8, student_number: '2026-0101', name: 'Joshua D. Garcia', section: 'BSIT-1A', course: 'BS Information Technology', year_level: '1st Year' },
+  { student_id: 9, student_number: '2026-0102', name: 'Bea A. Alonzo', section: 'BSIT-1A', course: 'BS Information Technology', year_level: '1st Year' },
+  { student_id: 10, student_number: '2026-0201', name: 'Daniel Padilla', section: 'BSIT-2A', course: 'BS Information Technology', year_level: '2nd Year' },
+  { student_id: 11, student_number: '2026-0202', name: 'Kathryn Bernardo', section: 'BSIT-2A', course: 'BS Information Technology', year_level: '2nd Year' },
+  { student_id: 12, student_number: '2026-0401', name: 'Mark Anthony Fernandez', section: 'BSIT-4A', course: 'BS Information Technology', year_level: '4th Year' },
+  { student_id: 13, student_number: '2026-0402', name: 'Liza Soberano', section: 'BSIT-4A', course: 'BS Information Technology', year_level: '4th Year' },
 ];
 
 export const INITIAL_EXAMS: Exam[] = [

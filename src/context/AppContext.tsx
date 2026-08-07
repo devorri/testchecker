@@ -14,6 +14,8 @@ interface AppContextType {
   scannedAnswers: ScannedAnswer[];
   addExam: (exam: Omit<Exam, 'exam_id'>, answerKey: Record<number, string>) => Exam;
   addStudent: (student: Omit<Student, 'student_id'>) => void;
+  updateStudent: (studentId: number, updatedData: Partial<Omit<Student, 'student_id'>>) => void;
+  deleteStudent: (studentId: number) => void;
   saveScannedResult: (result: Omit<ScannedAnswer, 'scan_id' | 'date_generated'>) => ScannedAnswer;
   deleteExam: (examId: number) => void;
   getAnswerKey: (examId: number) => Record<number, string>;
@@ -81,6 +83,14 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     setStudents(prev => [...prev, newStudent]);
   };
 
+  const updateStudent = (studentId: number, updatedData: Partial<Omit<Student, 'student_id'>>) => {
+    setStudents(prev => prev.map(s => s.student_id === studentId ? { ...s, ...updatedData } : s));
+  };
+
+  const deleteStudent = (studentId: number) => {
+    setStudents(prev => prev.filter(s => s.student_id !== studentId));
+  };
+
   const saveScannedResult = (resultData: Omit<ScannedAnswer, 'scan_id' | 'date_generated'>): ScannedAnswer => {
     const newScanId = scannedAnswers.length > 0 ? Math.max(...scannedAnswers.map(s => s.scan_id)) + 1 : 1001;
     const now = new Date();
@@ -114,6 +124,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         scannedAnswers,
         addExam,
         addStudent,
+        updateStudent,
+        deleteStudent,
         saveScannedResult,
         deleteExam,
         getAnswerKey

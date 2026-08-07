@@ -9,6 +9,7 @@ import ExamsPage from './pages/ExamsPage';
 import ScantronGenPage from './pages/ScantronGenPage';
 import ScannerPage from './pages/ScannerPage';
 import GradebookPage from './pages/GradebookPage';
+import StudentsPage from './pages/StudentsPage';
 import RequireAuth from './components/RequireAuth';
 
 export const AppRoutes: React.FC = () => {
@@ -58,6 +59,14 @@ export const AppRoutes: React.FC = () => {
           element={
             <RequireAuth allowedRoles={['instructor', 'admin']}>
               <GradebookPage />
+            </RequireAuth>
+          }
+        />
+        <Route
+          path="/students"
+          element={
+            <RequireAuth allowedRoles={['instructor', 'admin']}>
+              <StudentsPage />
             </RequireAuth>
           }
         />

@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { useApp } from '../context/AppContext';
 import { evaluateOMRResponse, generateMockScanData } from '../utils/omrScanner';
 import type { OMRScanResult } from '../utils/omrScanner';
@@ -11,7 +11,10 @@ import {
   Save,
   RotateCcw,
   Sparkles,
-  UserCheck
+  UserCheck,
+  Filter,
+  GraduationCap,
+  Users
 } from 'lucide-react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 
@@ -24,8 +27,43 @@ const ScannerPage: React.FC = () => {
   const [selectedExamId, setSelectedExamId] = useState<number>(defaultExamId || 1);
   const selectedExam = exams.find(e => e.exam_id === selectedExamId) || exams[0];
 
-  const [selectedStudentId, setSelectedStudentId] = useState<number>(students[0]?.student_id || 1);
-  const selectedStudent = students.find(s => s.student_id === selectedStudentId) || students[0];
+  // Year Level & Section Filters
+  const [selectedYear, setSelectedYear] = useState<string>('ALL');
+  const [selectedSection, setSelectedSection] = useState<string>('ALL');
+
+  // Available Filter Options
+  const availableYears = ['ALL', '1st Year', '2nd Year', '3rd Year', '4th Year'];
+  const availableSections = ['ALL', ...Array.from(new Set(students.map(s => s.section)))].sort();
+
+  // Filter students array dynamically based on active Year & Section
+  const filteredStudents = students.filter(s => {
+    const matchesYear = selectedYear === 'ALL' || s.year_level === selectedYear || (
+      !s.year_level && (
+        (selectedYear === '1st Year' && s.section.includes('1')) ||
+        (selectedYear === '2nd Year' && s.section.includes('2')) ||
+        (selectedYear === '3rd Year' && s.section.includes('3')) ||
+        (selectedYear === '4th Year' && s.section.includes('4'))
+      )
+    );
+    const matchesSection = selectedSection === 'ALL' || s.section === selectedSection;
+    return matchesYear && matchesSection;
+  });
+
+  const [selectedStudentId, setSelectedStudentId] = useState<number>(() => {
+    return filteredStudents[0]?.student_id || students[0]?.student_id || 1;
+  });
+
+  // Keep selectedStudentId in sync with filtered list
+  useEffect(() => {
+    if (filteredStudents.length > 0) {
+      const exists = filteredStudents.some(s => s.student_id === selectedStudentId);
+      if (!exists) {
+        setSelectedStudentId(filteredStudents[0].student_id);
+      }
+    }
+  }, [filteredStudents, selectedStudentId]);
+
+  const selectedStudent = students.find(s => s.student_id === selectedStudentId) || filteredStudents[0] || students[0];
 
   const [activeTab, setActiveTab] = useState<'camera' | 'upload'>('upload');
   const [scanning, setScanning] = useState(false);
@@ -34,6 +72,18 @@ const ScannerPage: React.FC = () => {
   const [autoDetectedId, setAutoDetectedId] = useState<string | null>(null);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Quick Action: Auto-filter by target exam section
+  const handleSyncExamSection = () => {
+    if (selectedExam) {
+      setSelectedSection(selectedExam.section);
+      if (selectedExam.section.includes('1')) setSelectedYear('1st Year');
+      else if (selectedExam.section.includes('2')) setSelectedYear('2nd Year');
+      else if (selectedExam.section.includes('3')) setSelectedYear('3rd Year');
+      else if (selectedExam.section.includes('4')) setSelectedYear('4th Year');
+      else setSelectedYear('ALL');
+    }
+  };
 
   const handleProcessScan = () => {
     setScanning(true);
@@ -47,7 +97,7 @@ const ScannerPage: React.FC = () => {
       const result = evaluateOMRResponse(mockDetectedAnswers, correctKey, selectedExam.total_questions);
 
       // Auto-Detect Student ID from Shaded Grid
-      const detectedNumber = selectedStudent.student_number;
+      const detectedNumber = selectedStudent ? selectedStudent.student_number : '2026-0012';
       setAutoDetectedId(detectedNumber);
 
       setScanResult(result);
@@ -56,7 +106,7 @@ const ScannerPage: React.FC = () => {
   };
 
   const handleSaveToDatabase = () => {
-    if (!scanResult) return;
+    if (!scanResult || !selectedStudent) return;
 
     saveScannedResult({
       student_id: selectedStudent.student_id,
@@ -88,12 +138,20 @@ const ScannerPage: React.FC = () => {
           </p>
         </div>
 
-        <button
-          onClick={() => navigate('/gradebook')}
-          className="btn-secondary text-xs py-2.5 px-4"
-        >
-          <FileCheck className="w-4 h-4 text-cyan-400" /> View Class Gradebook
-        </button>
+        <div className="flex flex-wrap gap-2">
+          <button
+            onClick={() => navigate('/students')}
+            className="btn-secondary text-xs py-2.5 px-4"
+          >
+            <Users className="w-4 h-4 text-cyan-400" /> Manage Student Rosters
+          </button>
+          <button
+            onClick={() => navigate('/gradebook')}
+            className="btn-secondary text-xs py-2.5 px-4"
+          >
+            <FileCheck className="w-4 h-4 text-cyan-400" /> View Class Gradebook
+          </button>
+        </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -121,13 +179,84 @@ const ScannerPage: React.FC = () => {
                 </option>
               ))}
             </select>
-            <span className="text-[11px] font-mono text-cyan-400 block mt-1">
-              Subject: {selectedExam?.subject} ({selectedExam?.total_questions} Questions)
-            </span>
+            <div className="flex items-center justify-between mt-1.5">
+              <span className="text-[11px] font-mono text-cyan-400">
+                Subject: {selectedExam?.subject} ({selectedExam?.total_questions} Questions)
+              </span>
+              {selectedExam?.section && selectedSection !== selectedExam.section && (
+                <button
+                  type="button"
+                  onClick={handleSyncExamSection}
+                  className="text-[10px] bg-cyan-500/10 hover:bg-cyan-500/20 text-cyan-300 px-2 py-0.5 rounded-full border border-cyan-500/30 transition flex items-center gap-1 font-sans"
+                  title="Filter roster to match exam section"
+                >
+                  <Filter className="w-2.5 h-2.5" /> Filter to {selectedExam.section}
+                </button>
+              )}
+            </div>
+          </div>
+
+          {/* Year & Section Filters */}
+          <div className="p-3.5 rounded-xl bg-slate-900/90 border border-white/10 space-y-3">
+            <div className="flex items-center justify-between border-b border-white/5 pb-2">
+              <span className="text-xs font-bold text-cyan-300 flex items-center gap-1.5">
+                <Filter className="w-3.5 h-3.5 text-cyan-400" /> Filter Student Roster
+              </span>
+              <span className="text-[10px] font-mono text-slate-400 bg-slate-950 px-2 py-0.5 rounded">
+                {filteredStudents.length} {filteredStudents.length === 1 ? 'Student' : 'Students'}
+              </span>
+            </div>
+
+            <div className="grid grid-cols-2 gap-2">
+              <div>
+                <label className="block text-[11px] font-medium text-slate-300 mb-1 flex items-center gap-1">
+                  <GraduationCap className="w-3 h-3 text-cyan-400" /> Year Level
+                </label>
+                <select
+                  className="input-dark py-1.5 text-xs"
+                  value={selectedYear}
+                  onChange={(e) => {
+                    setSelectedYear(e.target.value);
+                    setSavedSuccess(false);
+                  }}
+                >
+                  {availableYears.map(yr => (
+                    <option key={yr} value={yr}>
+                      {yr === 'ALL' ? 'All Years' : yr}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-[11px] font-medium text-slate-300 mb-1 flex items-center gap-1">
+                  <Users className="w-3 h-3 text-cyan-400" /> Section
+                </label>
+                <select
+                  className="input-dark py-1.5 text-xs"
+                  value={selectedSection}
+                  onChange={(e) => {
+                    setSelectedSection(e.target.value);
+                    setSavedSuccess(false);
+                  }}
+                >
+                  {availableSections.map(sec => (
+                    <option key={sec} value={sec}>
+                      {sec === 'ALL' ? 'All Sections' : sec}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </div>
           </div>
 
           <div>
-            <label className="block text-xs font-semibold text-slate-300 mb-1.5">Student Roster Assignment</label>
+            <label className="block text-xs font-semibold text-slate-300 mb-1.5 flex items-center justify-between">
+              <span>Student Roster Assignment</span>
+              {selectedSection !== 'ALL' && (
+                <span className="text-[10px] text-cyan-400 font-mono">Section: {selectedSection}</span>
+              )}
+            </label>
             <select
               className="input-dark"
               value={selectedStudentId}
@@ -135,12 +264,17 @@ const ScannerPage: React.FC = () => {
                 setSelectedStudentId(Number(e.target.value));
                 setSavedSuccess(false);
               }}
+              disabled={filteredStudents.length === 0}
             >
-              {students.map(s => (
-                <option key={s.student_id} value={s.student_id}>
-                  {s.name} ({s.student_number} • {s.section})
-                </option>
-              ))}
+              {filteredStudents.length > 0 ? (
+                filteredStudents.map(s => (
+                  <option key={s.student_id} value={s.student_id}>
+                    {s.name} ({s.student_number} • {s.section}{s.year_level ? ` • ${s.year_level}` : ''})
+                  </option>
+                ))
+              ) : (
+                <option value="">No students found in selected Year/Section</option>
+              )}
             </select>
             <span className="text-[10px] text-slate-400 block mt-1">
               (Auto-populated when shaded Student ID Grid is read by camera)
