@@ -201,76 +201,86 @@ const ExamsPage: React.FC = () => {
       </div>
 
       {/* List of Assessments */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {filteredExams.map((exam) => {
-          const key = getAnswerKey(exam.exam_id);
-          const keyCount = Object.keys(key).length || exam.total_questions;
-          return (
-            <div key={exam.exam_id} className="glass-card p-6 rounded-2xl border border-white/10 space-y-4 hover:border-cyan-500/30 transition">
-              <div className="flex justify-between items-start gap-3">
-                <div className="space-y-1">
-                  <div className="flex items-center gap-2">
-                    <span className="badge-pill font-mono">{exam.section}</span>
-                    <span className="text-[11px] font-mono text-cyan-400">
-                      {exam.total_questions} Questions (A–E)
-                    </span>
+      {filteredExams.length === 0 ? (
+        <div className="glass-card p-12 rounded-3xl border border-white/10 text-center space-y-3">
+          <FileText className="w-10 h-10 text-cyan-400 mx-auto opacity-50" />
+          <h3 className="text-base font-bold text-white">No Assessments Found</h3>
+          <p className="text-xs text-slate-400">
+            {searchQuery ? 'No assessments match your search filter.' : 'Click "Create New Assessment" or use the AI Generator to encode your first exam.'}
+          </p>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {filteredExams.map((exam) => {
+            const key = getAnswerKey(exam.exam_id);
+            const keyCount = Object.keys(key).length || exam.total_questions;
+            return (
+              <div key={exam.exam_id} className="glass-card p-6 rounded-2xl border border-white/10 space-y-4 hover:border-cyan-500/30 transition">
+                <div className="flex justify-between items-start gap-3">
+                  <div className="space-y-1">
+                    <div className="flex items-center gap-2">
+                      <span className="badge-pill font-mono">{exam.section}</span>
+                      <span className="text-[11px] font-mono text-cyan-400">
+                        {exam.total_questions} Questions (A–E)
+                      </span>
+                    </div>
+                    <h3 className="text-lg font-bold text-white pt-1">{exam.title}</h3>
+                    <p className="text-xs font-mono text-slate-400">{exam.subject}</p>
                   </div>
-                  <h3 className="text-lg font-bold text-white pt-1">{exam.title}</h3>
-                  <p className="text-xs font-mono text-slate-400">{exam.subject}</p>
+
+                  <div className="flex items-center gap-1">
+                    <button
+                      onClick={() => handleOpenEditModal(exam)}
+                      className="p-2 rounded-lg text-slate-400 hover:text-cyan-300 hover:bg-cyan-500/10 transition"
+                      title="Edit Assessment & Answer Keys"
+                    >
+                      <Pencil className="w-4 h-4" />
+                    </button>
+                    <button
+                      onClick={() => setExamToDelete({ id: exam.exam_id, title: exam.title })}
+                      className="p-2 rounded-lg text-slate-400 hover:text-red-400 hover:bg-red-500/10 transition"
+                      title="Delete Assessment"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  </div>
                 </div>
 
-                <div className="flex items-center gap-1">
-                  <button
-                    onClick={() => handleOpenEditModal(exam)}
-                    className="p-2 rounded-lg text-slate-400 hover:text-cyan-300 hover:bg-cyan-500/10 transition"
-                    title="Edit Assessment & Answer Keys"
-                  >
-                    <Pencil className="w-4 h-4" />
-                  </button>
-                  <button
-                    onClick={() => setExamToDelete({ id: exam.exam_id, title: exam.title })}
-                    className="p-2 rounded-lg text-slate-400 hover:text-red-400 hover:bg-red-500/10 transition"
-                    title="Delete Assessment"
-                  >
-                    <Trash2 className="w-4 h-4" />
-                  </button>
+                {/* Stored Answer Key Bubbles Preview */}
+                <div className="pt-3 border-t border-white/5">
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-xs font-semibold text-slate-300">Official Answer Key ({keyCount} items):</span>
+                    <button
+                      onClick={() => handleOpenEditModal(exam)}
+                      className="text-[10px] text-cyan-400 hover:underline"
+                    >
+                      Edit Key
+                    </button>
+                  </div>
+                  <div className="flex flex-wrap gap-1.5 max-h-24 overflow-y-auto p-2.5 rounded-xl bg-slate-950/80 font-mono text-xs border border-white/5">
+                    {Object.entries(key).slice(0, exam.total_questions).map(([q, ans]) => (
+                      <span key={q} className="px-2 py-0.5 rounded bg-cyan-500/15 text-cyan-300 border border-cyan-500/30 text-[11px] flex items-center gap-1">
+                        <span className="text-slate-400">{q}:</span>
+                        <strong>{ans}</strong>
+                      </span>
+                    ))}
+                  </div>
                 </div>
-              </div>
 
-              {/* Stored Answer Key Bubbles Preview */}
-              <div className="pt-3 border-t border-white/5">
-                <div className="flex items-center justify-between mb-2">
-                  <span className="text-xs font-semibold text-slate-300">Official Answer Key ({keyCount} items):</span>
-                  <button
-                    onClick={() => handleOpenEditModal(exam)}
-                    className="text-[10px] text-cyan-400 hover:underline"
-                  >
-                    Edit Key
-                  </button>
-                </div>
-                <div className="flex flex-wrap gap-1.5 max-h-24 overflow-y-auto p-2.5 rounded-xl bg-slate-950/80 font-mono text-xs border border-white/5">
-                  {Object.entries(key).slice(0, exam.total_questions).map(([q, ans]) => (
-                    <span key={q} className="px-2 py-0.5 rounded bg-cyan-500/15 text-cyan-300 border border-cyan-500/30 text-[11px] flex items-center gap-1">
-                      <span className="text-slate-400">{q}:</span>
-                      <strong>{ans}</strong>
-                    </span>
-                  ))}
+                {/* Action Buttons */}
+                <div className="flex gap-2 pt-2">
+                  <Link to={`/scanner?examId=${exam.exam_id}`} className="btn-cyan text-xs py-2 px-3 flex-1 justify-center">
+                    <Camera className="w-3.5 h-3.5" /> Scan OMR Papers
+                  </Link>
+                  <Link to={`/scantron-generator?examId=${exam.exam_id}`} className="btn-secondary text-xs py-2 px-3 flex-1 justify-center">
+                    <Printer className="w-3.5 h-3.5 text-cyan-400" /> Export Scantron
+                  </Link>
                 </div>
               </div>
-
-              {/* Action Buttons */}
-              <div className="flex gap-2 pt-2">
-                <Link to={`/scanner?examId=${exam.exam_id}`} className="btn-cyan text-xs py-2 px-3 flex-1 justify-center">
-                  <Camera className="w-3.5 h-3.5" /> Scan OMR Papers
-                </Link>
-                <Link to={`/scantron-generator?examId=${exam.exam_id}`} className="btn-secondary text-xs py-2 px-3 flex-1 justify-center">
-                  <Printer className="w-3.5 h-3.5 text-cyan-400" /> Export Scantron
-                </Link>
-              </div>
-            </div>
-          );
-        })}
-      </div>
+            );
+          })}
+        </div>
+      )}
 
       {/* CREATE / EDIT ASSESSMENT MODAL */}
       {showModal && (
@@ -386,21 +396,7 @@ const ExamsPage: React.FC = () => {
                       }}
                       className="text-[10px] bg-slate-900 hover:bg-slate-800 text-slate-300 px-2.5 py-1 rounded border border-white/10"
                     >
-                      Default All to A
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        const letters = ['A', 'B', 'C', 'D', 'E'];
-                        const randomKeys: Record<number, string> = {};
-                        for (let i = 1; i <= totalQuestions; i++) {
-                          randomKeys[i] = letters[Math.floor(Math.random() * letters.length)];
-                        }
-                        setKeyAnswers(randomKeys);
-                      }}
-                      className="text-[10px] bg-cyan-500/20 hover:bg-cyan-500/30 text-cyan-300 px-2.5 py-1 rounded border border-cyan-500/30 font-semibold"
-                    >
-                      Shuffle Demo Keys
+                      Reset All to Option A
                     </button>
                   </div>
                 </div>

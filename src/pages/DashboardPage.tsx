@@ -131,30 +131,41 @@ const DashboardPage: React.FC = () => {
           </div>
 
           <div className="space-y-4">
-            {exams.map(exam => (
-              <div key={exam.exam_id} className="glass-card p-6 rounded-2xl border border-white/10 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-                <div>
-                  <div className="flex items-center gap-2">
-                    <span className="badge-pill">{exam.section}</span>
-                    <span className="text-xs font-mono text-slate-400">{exam.subject}</span>
-                  </div>
-                  <h3 className="text-lg font-bold text-white mt-2">{exam.title}</h3>
-                  <div className="flex items-center gap-4 text-xs text-slate-400 mt-2">
-                    <span className="flex items-center gap-1"><Clock className="w-3.5 h-3.5 text-cyan-400" /> {exam.exam_date}</span>
-                    <span>• {exam.total_questions} Multiple Choice Items</span>
-                  </div>
-                </div>
-
-                <div className="flex items-center gap-2 w-full sm:w-auto">
-                  <Link to={`/scanner?examId=${exam.exam_id}`} className="btn-cyan text-xs py-2 px-3 flex-1 sm:flex-none justify-center">
-                    <Camera className="w-3.5 h-3.5" /> Scan Papers
-                  </Link>
-                  <Link to={`/scantron-generator?examId=${exam.exam_id}`} className="btn-secondary text-xs py-2 px-3 flex-1 sm:flex-none justify-center">
-                    <Printer className="w-3.5 h-3.5 text-cyan-400" /> Print
-                  </Link>
-                </div>
+            {exams.length === 0 ? (
+              <div className="glass-card p-10 rounded-2xl border border-white/10 text-center space-y-3">
+                <FileText className="w-8 h-8 text-cyan-400 mx-auto opacity-60" />
+                <h4 className="text-sm font-bold text-white">No active assessments</h4>
+                <p className="text-xs text-slate-400">Create an assessment to start grading student answer sheets.</p>
+                <Link to="/exams" className="btn-cyan text-xs inline-flex py-2 px-4">
+                  Create First Assessment
+                </Link>
               </div>
-            ))}
+            ) : (
+              exams.map(exam => (
+                <div key={exam.exam_id} className="glass-card p-6 rounded-2xl border border-white/10 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <span className="badge-pill">{exam.section}</span>
+                      <span className="text-xs font-mono text-slate-400">{exam.subject}</span>
+                    </div>
+                    <h3 className="text-lg font-bold text-white mt-2">{exam.title}</h3>
+                    <div className="flex items-center gap-4 text-xs text-slate-400 mt-2">
+                      <span className="flex items-center gap-1"><Clock className="w-3.5 h-3.5 text-cyan-400" /> {exam.exam_date}</span>
+                      <span>• {exam.total_questions} Multiple Choice Items</span>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-2 w-full sm:w-auto">
+                    <Link to={`/scanner?examId=${exam.exam_id}`} className="btn-cyan text-xs py-2 px-3 flex-1 sm:flex-none justify-center">
+                      <Camera className="w-3.5 h-3.5" /> Scan Papers
+                    </Link>
+                    <Link to={`/scantron-generator?examId=${exam.exam_id}`} className="btn-secondary text-xs py-2 px-3 flex-1 sm:flex-none justify-center">
+                      <Printer className="w-3.5 h-3.5 text-cyan-400" /> Print
+                    </Link>
+                  </div>
+                </div>
+              ))
+            )}
           </div>
         </div>
 
@@ -170,20 +181,30 @@ const DashboardPage: React.FC = () => {
           </div>
 
           <div className="glass-card p-4 rounded-2xl border border-white/10 space-y-3">
-            {scannedAnswers.slice(0, 5).map(scan => (
-              <div key={scan.scan_id} className="p-3 rounded-xl bg-slate-900/80 border border-white/5 flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-semibold text-white">{scan.student_name}</p>
-                  <p className="text-[11px] font-mono text-slate-400">{scan.student_number} • {scan.date_generated}</p>
-                </div>
-                <div className="text-right">
-                  <span className={`text-sm font-extrabold ${scan.remarks === 'PASSED' ? 'text-emerald-400' : 'text-red-400'}`}>
-                    {scan.score} / {scan.total}
-                  </span>
-                  <span className="block text-[10px] font-mono text-slate-400">{scan.percentage}%</span>
-                </div>
+            {scannedAnswers.length === 0 ? (
+              <div className="p-8 text-center space-y-2">
+                <Camera className="w-7 h-7 text-cyan-400 mx-auto opacity-50" />
+                <p className="text-xs text-slate-400">No scanned answer sheets recorded yet.</p>
+                <Link to="/scanner" className="text-[11px] text-cyan-400 hover:underline block pt-1">
+                  Open Scanner to grade papers
+                </Link>
               </div>
-            ))}
+            ) : (
+              scannedAnswers.slice(0, 5).map(scan => (
+                <div key={scan.scan_id} className="p-3 rounded-xl bg-slate-900/80 border border-white/5 flex items-center justify-between">
+                  <div>
+                    <p className="text-sm font-semibold text-white">{scan.student_name}</p>
+                    <p className="text-[11px] font-mono text-slate-400">{scan.student_number} • {scan.date_generated}</p>
+                  </div>
+                  <div className="text-right">
+                    <span className={`text-sm font-extrabold ${scan.remarks === 'PASSED' ? 'text-emerald-400' : 'text-red-400'}`}>
+                      {scan.score} / {scan.total}
+                    </span>
+                    <span className="block text-[10px] font-mono text-slate-400">{scan.percentage}%</span>
+                  </div>
+                </div>
+              ))
+            )}
           </div>
         </div>
 

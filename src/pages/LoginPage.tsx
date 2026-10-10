@@ -6,7 +6,6 @@ import {
   LogIn,
   Lock,
   Mail,
-  Key,
   ShieldCheck,
   Eye,
   EyeOff,
@@ -23,8 +22,8 @@ type AuthMode = 'login' | 'register' | 'forgot';
 
 const LoginPage: React.FC = () => {
   const [mode, setMode] = useState<AuthMode>('login');
-  const [email, setEmail] = useState('instructor@nvcfi.edu.ph');
-  const [password, setPassword] = useState('password123');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [fullName, setFullName] = useState('');
   const [department, setDepartment] = useState('CCIT Department');
   const [showPassword, setShowPassword] = useState(false);
@@ -165,11 +164,6 @@ const LoginPage: React.FC = () => {
     } else {
       setError('Incorrect OTP code. Please check the code dispatched to your email.');
     }
-  };
-
-  const handleQuickDemoLogin = () => {
-    login('instructor@nvcfi.edu.ph', 'password123');
-    navigate(from, { replace: true });
   };
 
   return (
@@ -404,19 +398,6 @@ const LoginPage: React.FC = () => {
                 </button>
               </div>
             </form>
-          )}
-
-          {/* Quick Demo Login Button */}
-          {mode === 'login' && (
-            <div className="pt-4 border-t border-white/10 text-center space-y-3">
-              <span className="text-xs text-slate-400 block">Quick Demo Access</span>
-              <button
-                onClick={handleQuickDemoLogin}
-                className="btn-secondary w-full justify-center text-xs py-2.5 border-dashed border-cyan-500/40 text-cyan-300"
-              >
-                <Key className="w-3.5 h-3.5" /> One-Click Login as Demo Instructor
-              </button>
-            </div>
           )}
 
         </div>

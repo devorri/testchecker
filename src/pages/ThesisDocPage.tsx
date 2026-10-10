@@ -48,7 +48,7 @@ const ThesisDocPage: React.FC = () => {
             </div>
             <h3 className="font-bold text-white text-base">Key Encoding</h3>
             <p className="text-xs text-slate-400 leading-relaxed">
-              Create an assessment in the Answer Key Manager, specifying total items and correct options (A–D).
+              Create an assessment in the Answer Key Manager, specifying total items and correct options (A–E).
             </p>
           </div>
 
