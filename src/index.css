@@ -322,6 +322,72 @@ body {
   z-index: 20;
 }
 
+/* Danger button */
+.btn-danger {
+  background: linear-gradient(135deg, #f87171 0%, #dc2626 100%);
+  color: #fff;
+  font-weight: 700;
+  padding: 10px 20px;
+  border-radius: 10px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 18px rgba(239, 68, 68, 0.3);
+}
+.btn-danger:hover { transform: translateY(-1px); box-shadow: 0 6px 22px rgba(239, 68, 68, 0.5); }
+
+/* Clickable answer bubbles (A–E) */
+.answer-bubble {
+  width: 30px;
+  height: 30px;
+  border-radius: 9999px;
+  border: 1.5px solid rgba(148, 163, 184, 0.5);
+  color: #cbd5e1;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  background: rgba(15, 23, 42, 0.8);
+  flex-shrink: 0;
+}
+.answer-bubble:hover { border-color: #38bdf8; color: #fff; transform: scale(1.08); }
+.answer-bubble.selected {
+  background: linear-gradient(135deg, #38bdf8 0%, #0284c7 100%);
+  border-color: #38bdf8;
+  color: #060a12;
+  box-shadow: 0 0 12px rgba(56, 189, 248, 0.55);
+}
+@media (max-width: 640px) {
+  .answer-bubble { width: 34px; height: 34px; font-size: 0.8rem; }
+}
+
+/* OTP digit boxes */
+.otp-box {
+  width: 46px;
+  height: 54px;
+  text-align: center;
+  font-family: var(--font-mono);
+  font-size: 1.4rem;
+  font-weight: 700;
+  border-radius: 12px;
+  background: rgba(15, 23, 42, 0.9);
+  border: 1px solid var(--border-subtle);
+  color: #fff;
+  outline: none;
+  transition: all 0.15s ease;
+}
+.otp-box:focus { border-color: #38bdf8; box-shadow: 0 0 14px rgba(56, 189, 248, 0.4); }
+@media (max-width: 400px) { .otp-box { width: 40px; height: 48px; font-size: 1.2rem; } }
+
+@keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+.animate-fadeIn { animation: fadeIn 0.3s ease-out; }
+
 /* Print CSS for Scantron Sheet */
 @media print {
   body {

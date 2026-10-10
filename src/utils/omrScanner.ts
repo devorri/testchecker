@@ -66,7 +66,7 @@ export function generateMockScanData(
   correctKey: Record<number, string>,
   accuracyRate: number = 0.85
 ): Record<number, string> {
-  const options = ['A', 'B', 'C', 'D'];
+  const options = ['A', 'B', 'C', 'D', 'E'];
   const mockAnswers: Record<number, string> = {};
 
   for (let q = 1; q <= totalQuestions; q++) {

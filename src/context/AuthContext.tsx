@@ -5,6 +5,7 @@ import { INITIAL_INSTRUCTOR } from '../utils/mockData';
 interface AuthContextType {
   authUser: Instructor | null;
   login: (email: string, password: string) => boolean;
+  register: (name: string, email: string, department: string) => boolean;
   logout: () => void;
   isAuthenticated: boolean;
 }
@@ -37,6 +38,21 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return false;
   };
 
+  const register = (name: string, email: string, department: string): boolean => {
+    if (name.trim() && email.trim()) {
+      const user: Instructor = {
+        instructor_id: Date.now(),
+        name: name.trim(),
+        email: email.trim(),
+        department: department.trim() || 'CCIT Department',
+        role: 'instructor'
+      };
+      setAuthUser(user);
+      return true;
+    }
+    return false;
+  };
+
   const logout = () => {
     setAuthUser(null);
   };
@@ -46,6 +62,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       value={{
         authUser,
         login,
+        register,
         logout,
         isAuthenticated: !!authUser
       }}

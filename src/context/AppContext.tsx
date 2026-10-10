@@ -13,6 +13,7 @@ interface AppContextType {
   answerKeys: Record<number, Record<number, string>>; // exam_id -> { qNum: option }
   scannedAnswers: ScannedAnswer[];
   addExam: (exam: Omit<Exam, 'exam_id'>, answerKey: Record<number, string>) => Exam;
+  updateExam: (examId: number, examData: Partial<Exam>, keyData?: Record<number, string>) => void;
   addStudent: (student: Omit<Student, 'student_id'>) => void;
   updateStudent: (studentId: number, updatedData: Partial<Omit<Student, 'student_id'>>) => void;
   deleteStudent: (studentId: number) => void;
@@ -74,6 +75,16 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     return newExam;
   };
 
+  const updateExam = (examId: number, examData: Partial<Exam>, keyData?: Record<number, string>) => {
+    setExams(prev => prev.map(e => e.exam_id === examId ? { ...e, ...examData } : e));
+    if (keyData) {
+      setAnswerKeys(prev => ({
+        ...prev,
+        [examId]: keyData
+      }));
+    }
+  };
+
   const addStudent = (studentData: Omit<Student, 'student_id'>) => {
     const newStudentId = students.length > 0 ? Math.max(...students.map(s => s.student_id)) + 1 : 1;
     const newStudent: Student = {
@@ -123,6 +134,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         answerKeys,
         scannedAnswers,
         addExam,
+        updateExam,
         addStudent,
         updateStudent,
         deleteStudent,
