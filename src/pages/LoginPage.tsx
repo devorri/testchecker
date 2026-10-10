@@ -17,6 +17,8 @@ import {
   Sparkles
 } from 'lucide-react';
 
+import { sendEmailOtp } from '../utils/emailOtpService';
+
 type AuthMode = 'login' | 'register' | 'forgot';
 
 const LoginPage: React.FC = () => {
@@ -28,6 +30,7 @@ const LoginPage: React.FC = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
   const [infoMessage, setInfoMessage] = useState('');
+  const [sendingOtp, setSendingOtp] = useState(false);
 
   // OTP Verification Modal State
   const [showOtpModal, setShowOtpModal] = useState(false);
@@ -35,6 +38,7 @@ const LoginPage: React.FC = () => {
   const [generatedOtp, setGeneratedOtp] = useState('');
   const [otpCountdown, setOtpCountdown] = useState(60);
   const [otpTargetAction, setOtpTargetAction] = useState<'login' | 'register' | 'forgot'>('login');
+  const [emailStatus, setEmailStatus] = useState<string>('');
 
   const { login, register } = useAuth();
   const navigate = useNavigate();
@@ -51,14 +55,28 @@ const LoginPage: React.FC = () => {
     return () => clearTimeout(timer);
   }, [showOtpModal, otpCountdown]);
 
-  const triggerEmailOtp = (action: 'login' | 'register' | 'forgot') => {
-    const code = Math.floor(100000 + Math.random() * 900000).toString();
-    setGeneratedOtp(code);
+  const triggerEmailOtp = async (action: 'login' | 'register' | 'forgot') => {
+    setSendingOtp(true);
+    setError('');
+    const targetEmail = email.trim();
+    if (!targetEmail) {
+      setError('Please provide a valid email address.');
+      setSendingOtp(false);
+      return;
+    }
+
+    const result = await sendEmailOtp(targetEmail);
+    setGeneratedOtp(result.code);
     setOtpDigits(['', '', '', '', '', '']);
     setOtpCountdown(60);
     setOtpTargetAction(action);
     setShowOtpModal(true);
-    setError('');
+    setSendingOtp(false);
+    if (result.success) {
+      setEmailStatus('Sent to your inbox via EmailJS');
+    } else {
+      setEmailStatus('Simulated mode (check below or console)');
+    }
   };
 
   const handleLoginSubmit = (e: React.FormEvent) => {
@@ -270,10 +288,12 @@ const LoginPage: React.FC = () => {
 
                 <button
                   type="button"
+                  disabled={sendingOtp}
                   onClick={() => triggerEmailOtp('login')}
-                  className="btn-secondary w-full justify-center text-xs py-2.5 border-dashed border-cyan-500/30 text-cyan-300"
+                  className="btn-secondary w-full justify-center text-xs py-2.5 border-dashed border-cyan-500/30 text-cyan-300 disabled:opacity-50"
                 >
-                  <Sparkles className="w-3.5 h-3.5" /> Sign In with Email OTP
+                  <Sparkles className="w-3.5 h-3.5" />
+                  {sendingOtp ? 'Sending Email OTP via EmailJS...' : 'Sign In with Email OTP'}
                 </button>
               </div>
             </form>
@@ -426,12 +446,15 @@ const LoginPage: React.FC = () => {
               </p>
             </div>
 
-            {/* Simulated Email Dispatch Toast */}
+            {/* Real EmailJS Dispatch Status & Auto-Fill Toast */}
             <div className="p-3 rounded-xl bg-cyan-500/10 border border-cyan-500/30 text-xs text-cyan-300 flex items-center justify-between">
               <div>
-                <span className="font-bold block">Simulated Email Inbox:</span>
-                <span className="font-mono text-sm tracking-wider font-extrabold text-white">
-                  {generatedOtp}
+                <span className="font-bold flex items-center gap-1.5 text-white">
+                  <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
+                  {emailStatus || 'Email Dispatched via EmailJS'}
+                </span>
+                <span className="font-mono text-xs text-slate-300">
+                  Code: <strong className="text-cyan-300 font-mono tracking-wider">{generatedOtp}</strong>
                 </span>
               </div>
               <button
