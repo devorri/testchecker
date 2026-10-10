@@ -12,8 +12,7 @@ import {
   UserPlus,
   RefreshCw,
   ArrowLeft,
-  CheckCircle2,
-  Sparkles
+  CheckCircle2
 } from 'lucide-react';
 
 import { sendEmailOtp } from '../utils/emailOtpService';
@@ -81,13 +80,12 @@ const LoginPage: React.FC = () => {
   const handleLoginSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
-    if (!email || !password) return;
-
-    if (login(email, password)) {
-      navigate(from, { replace: true });
-    } else {
-      setError('Invalid email or password. Please check your credentials.');
+    if (!email.trim() || !password.trim()) {
+      setError('Please enter your email and password to continue.');
+      return;
     }
+    // Unified 2-Step Login: Require Email OTP verification before entering dashboard
+    triggerEmailOtp('login');
   };
 
   const handleRegisterSubmit = (e: React.FormEvent) => {
@@ -275,19 +273,22 @@ const LoginPage: React.FC = () => {
                 </div>
               </div>
 
-              <div className="space-y-2.5 pt-2">
-                <button type="submit" className="btn-cyan w-full justify-center py-3 text-sm">
-                  <LogIn className="w-4 h-4" /> Sign In to Dashboard
-                </button>
-
+              <div className="pt-2">
                 <button
-                  type="button"
+                  type="submit"
                   disabled={sendingOtp}
-                  onClick={() => triggerEmailOtp('login')}
-                  className="btn-secondary w-full justify-center text-xs py-2.5 border-dashed border-cyan-500/30 text-cyan-300 disabled:opacity-50"
+                  className="btn-cyan w-full justify-center py-3 text-sm shadow-xl shadow-cyan-500/20 disabled:opacity-50"
                 >
-                  <Sparkles className="w-3.5 h-3.5" />
-                  {sendingOtp ? 'Sending Email OTP via EmailJS...' : 'Sign In with Email OTP'}
+                  {sendingOtp ? (
+                    <span className="flex items-center gap-2">
+                      <span className="w-4 h-4 rounded-full border-2 border-slate-950 border-t-transparent animate-spin"></span>
+                      Verifying & Sending OTP...
+                    </span>
+                  ) : (
+                    <span className="flex items-center gap-2">
+                      <LogIn className="w-4 h-4" /> Sign In to Dashboard
+                    </span>
+                  )}
                 </button>
               </div>
             </form>
