@@ -36,7 +36,6 @@ const LoginPage: React.FC = () => {
   const [generatedOtp, setGeneratedOtp] = useState('');
   const [otpCountdown, setOtpCountdown] = useState(60);
   const [otpTargetAction, setOtpTargetAction] = useState<'login' | 'register' | 'forgot'>('login');
-  const [emailStatus, setEmailStatus] = useState<string>('');
 
   const { login, register } = useAuth();
   const navigate = useNavigate();
@@ -64,17 +63,19 @@ const LoginPage: React.FC = () => {
     }
 
     const result = await sendEmailOtp(targetEmail);
+    setSendingOtp(false);
+
+    if (!result.success || !result.code) {
+      setError(`Failed to send email to ${targetEmail}: ${result.error || 'Please verify your email address or network connection.'}`);
+      return;
+    }
+
+    // Real email sent successfully via EmailJS!
     setGeneratedOtp(result.code);
     setOtpDigits(['', '', '', '', '', '']);
     setOtpCountdown(60);
     setOtpTargetAction(action);
     setShowOtpModal(true);
-    setSendingOtp(false);
-    if (result.success) {
-      setEmailStatus('Sent to your inbox via EmailJS');
-    } else {
-      setEmailStatus('Simulated mode (check below or console)');
-    }
   };
 
   const handleLoginSubmit = (e: React.FormEvent) => {
@@ -147,7 +148,7 @@ const LoginPage: React.FC = () => {
       return;
     }
 
-    if (entered === generatedOtp || entered === '123456') {
+    if (entered === generatedOtp) {
       setShowOtpModal(false);
       if (otpTargetAction === 'register') {
         register(fullName, email, department);
@@ -428,24 +429,15 @@ const LoginPage: React.FC = () => {
               </p>
             </div>
 
-            {/* Real EmailJS Dispatch Status & Auto-Fill Toast */}
-            <div className="p-3 rounded-xl bg-cyan-500/10 border border-cyan-500/30 text-xs text-cyan-300 flex items-center justify-between">
-              <div>
-                <span className="font-bold flex items-center gap-1.5 text-white">
-                  <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
-                  {emailStatus || 'Email Dispatched via EmailJS'}
-                </span>
-                <span className="font-mono text-xs text-slate-300">
-                  Code: <strong className="text-cyan-300 font-mono tracking-wider">{generatedOtp}</strong>
-                </span>
+            {/* Real Email Dispatch Confirmation Banner */}
+            <div className="p-3.5 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-xs text-emerald-300 flex items-start gap-2.5">
+              <CheckCircle2 className="w-4 h-4 text-emerald-400 flex-shrink-0 mt-0.5" />
+              <div className="space-y-0.5">
+                <span className="font-bold text-white block">Email Sent Successfully</span>
+                <p className="text-[11px] text-slate-300">
+                  A 6-digit verification code has been dispatched to your email inbox via EmailJS. Please check your inbox or spam folder and enter it below.
+                </p>
               </div>
-              <button
-                type="button"
-                onClick={() => setOtpDigits(generatedOtp.split(''))}
-                className="text-[10px] bg-cyan-500/20 hover:bg-cyan-500/30 text-cyan-200 px-2 py-1 rounded border border-cyan-500/40"
-              >
-                Auto-Fill Code
-              </button>
             </div>
 
             {error && (

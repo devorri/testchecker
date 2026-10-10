@@ -6,13 +6,13 @@ const PUBLIC_KEY = import.meta.env.VITE_EMAILJS_PUBLIC_KEY || '-1ihLys3f_2wXY-zh
 
 export interface SendOtpResult {
   success: boolean;
-  code: string;
+  code?: string;
   error?: string;
 }
 
 /**
- * Sends a real 6-digit OTP code to the recipient email via EmailJS.
- * Matches template variables: {{passcode}}, {{time}}, and recipient email.
+ * Sends a real 6-digit OTP code to the recipient's real email inbox via EmailJS.
+ * Maps exact template variables: {{passcode}}, {{time}}, and recipient email.
  */
 export async function sendEmailOtp(recipientEmail: string): Promise<SendOtpResult> {
   const code = Math.floor(100000 + Math.random() * 900000).toString();
@@ -27,23 +27,30 @@ export async function sendEmailOtp(recipientEmail: string): Promise<SendOtpResul
     to_email: recipientEmail,
     email: recipientEmail,
     user_email: recipientEmail,
-    recipient: recipientEmail
+    recipient: recipientEmail,
+    to_name: recipientEmail.split('@')[0],
+    reply_to: recipientEmail
   };
 
   try {
-    const res = await emailjs.send(SERVICE_ID, TEMPLATE_ID, templateParams, PUBLIC_KEY);
-    console.log('EmailJS OTP sent successfully:', res.status, res.text);
+    // Initialize EmailJS with public key
+    emailjs.init({ publicKey: PUBLIC_KEY });
+
+    const res = await emailjs.send(SERVICE_ID, TEMPLATE_ID, templateParams, {
+      publicKey: PUBLIC_KEY
+    });
+
+    console.log('[EmailJS] OTP email successfully dispatched:', res.status, res.text);
     return {
       success: true,
       code
     };
   } catch (err: any) {
-    console.warn('EmailJS error sending OTP:', err);
-    // Even if EmailJS has network or quota error, return code so testing does not break
+    const errorMsg = err?.text || err?.message || 'Failed to dispatch email via EmailJS';
+    console.error('[EmailJS] Error sending OTP email:', err);
     return {
       success: false,
-      code,
-      error: err?.text || err?.message || 'Failed to dispatch email'
+      error: errorMsg
     };
   }
 }
