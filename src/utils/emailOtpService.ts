@@ -1,8 +1,8 @@
 import emailjs from '@emailjs/browser';
 
-const SERVICE_ID = import.meta.env.VITE_EMAILJS_SERVICE_ID || 'service_6edxlbw';
-const TEMPLATE_ID = import.meta.env.VITE_EMAILJS_TEMPLATE_ID || 'template_p1nlko5';
-const PUBLIC_KEY = import.meta.env.VITE_EMAILJS_PUBLIC_KEY || '-1ihLys3f_2wXY-zh';
+const SERVICE_ID = import.meta.env.VITE_EMAILJS_SERVICE_ID || 'service_driw989';
+const TEMPLATE_ID = import.meta.env.VITE_EMAILJS_TEMPLATE_ID || 'template_tzh3cj2';
+const PUBLIC_KEY = import.meta.env.VITE_EMAILJS_PUBLIC_KEY || 'rWIVu1aXQ0CiXmFNa';
 
 export interface SendOtpResult {
   success: boolean;
